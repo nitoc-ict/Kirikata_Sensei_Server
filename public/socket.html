@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Socket.IO Room Example</title>
+  </head>
+  <body style="display: none">
+    <script type="module">
+      const permission = sessionStorage.getItem("permission");
+
+      // 通信画面へリダイレクト
+      if (permission === "admin") {
+        window.location.href = "/admin.html";
+      } else if (permission === "user") {
+        window.location.href = "/student.html";
+      } else {
+        window.location.href = "/login.html";
+      }
+    </script>
+  </body>
+</html>

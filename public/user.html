@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Test Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1b2e 0%,
+          #16213e 50%,
+          #0f0e23 100%
+        );
+        color: #ffffff;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header p {
+        color: #a0a4b8;
+        font-size: 1rem;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .card h3 {
+        color: #667eea;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .card h3::before {
+        content: "●";
+        color: #667eea;
+        font-size: 0.8rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group:last-of-type {
+        margin-bottom: 25px;
+      }
+
+      .input,
+      .search-input,
+      .select {
+        width: 100%;
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        color: #ffffff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .select {
+        cursor: pointer;
+      }
+
+      .select option {
+        background: #1a1b2e;
+        color: #ffffff;
+      }
+
+      #username {
+        margin-bottom: 24px;
+      }
+
+      #password {
+        margin-bottom: 24px;
+      }
+
+      .input:focus,
+      .search-input:focus,
+      .select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .input::placeholder,
+      .search-input::placeholder {
+        color: #6b7280;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        margin-top: auto;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .data-section {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .search-section {
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: 1fr 200px;
+        gap: 15px;
+        align-items: end;
+      }
+
+      .search-section h3 {
+        color: #667eea;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        grid-column: 1 / -1;
+      }
+
+      .search-section h3::before {
+        content: "●";
+        color: #667eea;
+        font-size: 0.8rem;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+      }
+
+      .table th {
+        background: rgba(102, 126, 234, 0.2);
+        color: #ffffff;
+        padding: 18px 15px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .table td {
+        padding: 18px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+      }
+
+      .table tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #6b7280;
+        font-style: italic;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .btn-edit {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+      }
+
+      .btn-delete {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+      }
+
+      .btn-small:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .response-section {
+        margin-top: 30px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 20px;
+      }
+
+      .response-section h4 {
+        color: #667eea;
+        margin-bottom: 15px;
+      }
+
+      .response-content {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        font-family: "Courier New", monospace;
+        font-size: 0.875rem;
+        color: #a0a4b8;
+        white-space: pre-wrap;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .permission-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .permission-admin {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+      }
+
+      .permission-user {
+        background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .search-section {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .container {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>API Test Dashboard</h1>
+        <p>RESTful APIのテスト用インターフェース - Permission Management対応</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- ユーザー作成 -->
+        <div class="card">
+          <h3>ユーザー作成</h3>
+          <div class="form-group">
+            <input
+              type="text"
+              id="username"
+              class="input"
+              placeholder="ユーザー名を入力"
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="password"
+              class="input"
+              placeholder="パスワードを入力"
+            />
+          </div>
+          <div class="form-group">
+            <select id="permission" class="select">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button onclick="createUser()" class="btn">Create User</button>
+        </div>
+
+        <!-- ユーザー更新 -->
+        <div class="card">
+          <h3>ユーザー更新</h3>
+          <div class="form-group">
+            <input
+              type="text"
+              id="updateId"
+              class="input"
+              placeholder="更新するユーザーID"
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="text"
+              id="updateUsername"
+              class="input"
+              placeholder="新しいユーザー名"
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="updatePassword"
+              class="input"
+              placeholder="新しいパスワード"
+            />
+          </div>
+          <div class="form-group">
+            <select id="updatePermission" class="select">
+              <option value="">権限を変更しない</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button onclick="updateUser()" class="btn">Update User</button>
+        </div>
+      </div>
+
+      <!-- データ表示セクション -->
+      <div class="data-section">
+        <div class="search-section">
+          <h3>ユーザー検索・フィルター</h3>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="ユーザーIDまたはユーザー名を入力"
+            oninput="filterUsers()"
+          />
+          <select id="permissionFilter" class="select" onchange="filterUsers()">
+            <option value="">全ての権限</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>ユーザー名</th>
+                <th>パスワード</th>
+                <th>権限</th>
+                <th>作成日時</th>
+                <th>アクション</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr>
+                <td colspan="6" class="no-data">データを読み込み中...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="response-section">
+          <h4>レスポンス</h4>
+          <div id="response" class="response-content">
+            APIレスポンスがここに表示されます
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API = "/api";
+      let allUsers = [];
+
+      function showResponse(data) {
+        document.getElementById("response").textContent = JSON.stringify(
+          data,
+          null,
+          2
+        );
+      }
+
+      async function request(url, method = "GET", data = null) {
+        try {
+          const options = { method };
+          if (data) {
+            options.headers = { "Content-Type": "application/json" };
+            options.body = JSON.stringify(data);
+          }
+          const response = await fetch(url, options);
+          const result = await response.json();
+          showResponse(result);
+          return result;
+        } catch (error) {
+          showResponse({ error: error.message });
+          return { error: error.message };
+        }
+      }
+
+      async function loadUsers() {
+        const result = await request(`${API}/users`);
+        if (result && result.users) {
+          allUsers = result.users;
+          displayUsers(allUsers);
+        } else if (result && Array.isArray(result)) {
+          allUsers = result;
+          displayUsers(allUsers);
+        }
+      }
+
+      function displayUsers(users) {
+        const tbody = document.getElementById("userTableBody");
+
+        if (!users || users.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="no-data">ユーザーデータがありません</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = users
+          .map((user) => {
+            const createdAt = user.createdAt
+              ? new Date(user.createdAt).toLocaleString("ja-JP")
+              : "N/A";
+            const permission = user.permission || "user";
+
+            return `
+                    <tr>
+                        <td>${user.id || user._id || "N/A"}</td>
+                        <td>${user.username || "N/A"}</td>
+                        <td>${user.password || "N/A"}</td>
+                        <td>
+                            <span class="permission-badge permission-${permission}">
+                                ${permission}
+                            </span>
+                        </td>
+                        <td>${createdAt}</td>
+                        <td class="actions">
+                            <button class="btn-small btn-edit" onclick="editUser('${
+                              user.id || user._id
+                            }')">編集</button>
+                            <button class="btn-small btn-delete" onclick="deleteUser('${
+                              user.id || user._id
+                            }')">削除</button>
+                        </td>
+                    </tr>
+                `;
+          })
+          .join("");
+      }
+
+      function filterUsers() {
+        const searchValue = document
+          .getElementById("searchInput")
+          .value.trim()
+          .toLowerCase();
+        const permissionFilter =
+          document.getElementById("permissionFilter").value;
+
+        let filteredUsers = allUsers;
+
+        // テキスト検索フィルター
+        if (searchValue) {
+          filteredUsers = filteredUsers.filter((user) => {
+            const userId = (user.id || user._id || "").toString().toLowerCase();
+            const username = (user.username || "").toLowerCase();
+            return (
+              userId.includes(searchValue) || username.includes(searchValue)
+            );
+          });
+        }
+
+        // 権限フィルター
+        if (permissionFilter) {
+          filteredUsers = filteredUsers.filter((user) => {
+            const userPermission = user.permission || "user";
+            return userPermission === permissionFilter;
+          });
+        }
+
+        displayUsers(filteredUsers);
+      }
+
+      async function createUser() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const permission = document.getElementById("permission").value;
+
+        if (!username || !password) {
+          alert("ユーザー名とパスワードは必須です");
+          return;
+        }
+
+        const data = { username, password, permission };
+
+        const result = await request(`${API}/users`, "POST", data);
+
+        if (!result.error) {
+          // フォームをクリア
+          document.getElementById("username").value = "";
+          document.getElementById("password").value = "";
+          document.getElementById("permission").value = "user";
+
+          // ユーザーリストを再読み込み
+          await loadUsers();
+        }
+      }
+
+      async function updateUser() {
+        const id = document.getElementById("updateId").value;
+        const username = document.getElementById("updateUsername").value;
+        const password = document.getElementById("updatePassword").value;
+        const permission = document.getElementById("updatePermission").value;
+
+        if (!id) {
+          alert("ユーザーIDは必須です");
+          return;
+        }
+
+        const data = {};
+        if (username) data.username = username;
+        if (password) data.password = password;
+        if (permission) data.permission = permission;
+
+        if (Object.keys(data).length === 0) {
+          alert("更新する項目を入力してください");
+          return;
+        }
+
+        const result = await request(`${API}/users/${id}`, "PUT", data);
+
+        if (!result.error) {
+          // フォームをクリア
+          document.getElementById("updateId").value = "";
+          document.getElementById("updateUsername").value = "";
+          document.getElementById("updatePassword").value = "";
+          document.getElementById("updatePermission").value = "";
+
+          // ユーザーリストを再読み込み
+          await loadUsers();
+        }
+      }
+
+      function editUser(id) {
+        const user = allUsers.find((u) => (u.id || u._id) == id);
+        if (user) {
+          document.getElementById("updateId").value = user.id || user._id;
+          document.getElementById("updateUsername").value = user.username || "";
+          document.getElementById("updatePassword").value = user.password || "";
+          document.getElementById("updatePermission").value =
+            user.permission || "user";
+
+          // 更新セクションにスクロール
+          document
+            .querySelector(".dashboard-grid")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      async function deleteUser(id) {
+        if (!confirm("このユーザーを削除してもよろしいですか？")) {
+          return;
+        }
+
+        const result = await request(`${API}/users/${id}`, "DELETE");
+
+        if (!result.error) {
+          // ユーザーリストを再読み込み
+          await loadUsers();
+        }
+      }
+
+      // ページ読み込み時にユーザーデータを取得
+      window.addEventListener("DOMContentLoaded", loadUsers);
+    </script>
+  </body>
+</html>

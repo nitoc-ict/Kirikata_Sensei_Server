@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Navigation</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1b2e 0%,
+          #16213e 50%,
+          #0f0e23 100%
+        );
+        color: #ffffff;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        max-width: 800px;
+        text-align: center;
+      }
+
+      .header {
+        margin-bottom: 60px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header p {
+        color: #a0a4b8;
+        font-size: 1.2rem;
+      }
+
+      .nav-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .nav-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 40px 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .nav-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        border-color: rgba(102, 126, 234, 0.3);
+      }
+
+      .nav-card h3 {
+        color: #667eea;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .nav-card h3::before {
+        content: "●";
+        color: #667eea;
+        font-size: 1rem;
+      }
+
+      .nav-card p {
+        color: #a0a4b8;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 768px) {
+        .nav-grid {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        .header h1 {
+          font-size: 2.5rem;
+        }
+
+        .nav-card {
+          padding: 30px 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Log out</h1>
+        <p>セッション情報の破棄</p>
+      </div>
+
+      <div class="nav-grid">
+        <div class="nav-card" id="logout">
+          <h3>ログアウト</h3>
+          <p>セッション情報を破棄する</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("logout").addEventListener("click", () => {
+        // セッションストレージからトークンを削除
+        sessionStorage.removeItem("token");
+        alert("ログアウトしました。ログインページに移動します。");
+        // ログインページにリダイレクト
+        window.location.href = "./";
+      });
+    </script>
+  </body>
+</html>
