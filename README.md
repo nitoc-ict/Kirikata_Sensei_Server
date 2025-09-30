@@ -140,6 +140,9 @@ message
     message, # ホスト切断通知
 
 roomInfo
+  succece: boolen
+  maxSeats: int
+  occupiesdSeats: int[]
 sessionStarted
 sessionEnded
 seatUpdate

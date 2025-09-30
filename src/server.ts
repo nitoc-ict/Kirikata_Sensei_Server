@@ -22,7 +22,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 3000;
+const portStr = process.env.PORT || "3000";
+const PORT = parseInt(portStr, 10) || 3000;
 
 const jwtSecret = process.env.JWT_SECRET || "your-secret-key";
 
