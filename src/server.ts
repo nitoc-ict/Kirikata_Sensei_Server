@@ -57,6 +57,16 @@ app.delete("/api/users/:id", deleteUser);
 
 app.post("/api/auth", authenticateUser);
 
+// テスト用エンドポイント
+app.get("/api/get", (req, res) => {
+  res.json({ message: "GET method success!" });
+});
+
+app.get("/api/post", (req, res) => {
+  const data = req.body;
+  return data;
+});
+
 setupSocket(server);
 
 server.listen(PORT, "0.0.0.0", () => {

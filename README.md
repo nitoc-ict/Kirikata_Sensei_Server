@@ -1,6 +1,6 @@
 # 料理教室管理システム Socket.IO API ドキュメント
 
-## ユーザー管理のAPI ドキュメントは[こちら](api.md)
+## ユーザー管理の API ドキュメントは[こちら](userControllerAPIDocs.md)
 
 ## 目次
 
