@@ -13,7 +13,7 @@ import {
   deleteUser,
 } from "./userController.js";
 
-import { authenticateUser } from "./auth.js";
+import { authenticateUser, generateSpecialToken } from "./auth.js";
 import { setupSocket } from "./socket.js";
 
 // ESM環境では __dirname がないので下記で定義する
@@ -56,6 +56,7 @@ app.put("/api/users/:id", updateUser);
 app.delete("/api/users/:id", deleteUser);
 
 app.post("/api/auth", authenticateUser);
+app.post("/api/special-token", generateSpecialToken);
 
 // テスト用エンドポイント
 app.get("/api/get", (req, res) => {

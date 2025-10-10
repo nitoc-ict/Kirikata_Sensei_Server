@@ -52,34 +52,51 @@ export const authenticateUser = async (req: Request, res: Response) => {
   }
 };
 
-// // ユーザー認証情報照会 (POST)
-// export const checkUserStatus = async (req: Request, res: Response) => {
-//   try {
-//     const token = req.params.id as string;
+/**
+ * 特別な長寿命JWTを生成する関数
+ * @param user - トークンのペイロードに含めるユーザー情報
+ * @returns 生成されたJWT文字列
+ */
+export const generateSpecialToken = async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) {
+      console.log("error");
+      return res.status(401).json({
+        error: "ユーザーが見つかりません",
+        status: 401,
+      });
+    }
 
-//     try {
-//       const decoded = jwt.verify(token, SECRET_KEY) as {
-//         id: string;
-//         username: string;
-//       };
-//       const { id, username } = decoded;
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({
+        error: "パスワードが間違っています",
+        status: 401,
+      });
+    }
 
-//       console.log("Decoded token:", decoded);
+    // jwt発行(ユーザー情報の一部だけをペイロードとして含める)
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      SECRET_KEY,
+      // セッションの有効期限を1時間に設定
+      { expiresIn: "1y" }
+    );
 
-//       res.json({
-//         message: "認証に成功しました",
-//         userId: id,
-//         username: username,
-//       });
-//     } catch (err) {
-//       console.error("Token verification failed:", err);
-//       return res.status(403).json({ error: "無効なトークンです" });
-//     }
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       res.status(400).json({ error: error.message });
-//     } else {
-//       res.status(400).json({ error: "不明なエラーが発生しました" });
-//     }
-//   }
-// };
+    res.status(200).json({
+      message: "認証に成功しました",
+      token,
+      // userId: user._id,
+      permission: user.permission,
+      status: 200,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "不明なエラーが発生しました" });
+    }
+  }
+};

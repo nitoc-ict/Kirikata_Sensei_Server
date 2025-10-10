@@ -183,6 +183,21 @@ function setupSocket(server: http.Server): void {
       }
     );
 
+    // 生徒情報取得(PCでの推論時に実行)
+    socket.on("studentInfo", (data: { room: string }) => {
+      const { room } = data;
+      const roomInfo = roomMap.get(room);
+      if (!roomInfo) {
+        console.log("Room not found for studentInfo:", room);
+        return;
+      }
+
+      // 生徒の座席情報を送信
+      io.to(room).emit("studentInfo", {
+        occupiedSeats: Array.from(roomInfo.occupiedSeats),
+      });
+    });
+
     // セッション開始
     socket.on("startSession", (data: { room: string; recipeId: string }) => {
       const user = userMap.get(socket.id);
@@ -326,12 +341,42 @@ function setupSocket(server: http.Server): void {
 
         clients.forEach((clientId) => {
           const user = userMap.get(clientId);
-          if (user && user.role === "host") {
+          if (user) {
             io.to(clientId).emit("dangerAlert", {
               userId: data.userId,
               username: data.username,
               seatIndex: data.seatIndex,
               message: data.message || "危険な状況が発生しました",
+              timeStamp: new Date().toISOString(),
+            });
+          }
+        });
+      }
+    );
+
+    socket.on(
+      "safeSignal",
+      (data: {
+        room: string;
+        userId: string;
+        username: string;
+        seatIndex: number;
+      }) => {
+        console.log("Safe Signal received:", data);
+
+        // 教師側に安全確認を送信
+        const room = data.room;
+        const clients = Array.from(
+          io.sockets.adapter.rooms.get(room) ?? []
+        ) as string[];
+
+        clients.forEach((clientId) => {
+          const user = userMap.get(clientId);
+          if (user) {
+            io.to(clientId).emit("safeSignal", {
+              userId: data.userId,
+              username: data.username,
+              seatIndex: data.seatIndex,
               timeStamp: new Date().toISOString(),
             });
           }
